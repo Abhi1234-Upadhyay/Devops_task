@@ -1,0 +1,33 @@
+---
+- name: Deploy Node.js application
+  hosts: my_ec2
+  become: yes
+  tasks:
+    - name: Update packages and install Node.js
+      yum:
+        name:
+          - '*'
+          - nodejs
+        state: latest
+
+    - name: Copy application files
+      copy:
+        src: /path/to/your/nodejs/app/
+        dest: /home/ec2-user/app/
+
+    - name: Install npm dependencies
+      npm:
+        path: /home/ec2-user/app/
+
+    - name: Start Node.js application
+      command: nohup node /home/ec2-user/app/app.js &
+
+    - name: Configure NGINX
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/conf.d/app.conf
+
+    - name: Restart NGINX
+      service:
+        name: nginx
+        state: restarted
